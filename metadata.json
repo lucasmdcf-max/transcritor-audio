@@ -1,0 +1,10 @@
+{
+  "name": "Gemini Audio Transcriber",
+  "description": "A powerful audio transcription tool using the Gemini 3 Flash model to convert speech to text instantly.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
