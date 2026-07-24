@@ -161,12 +161,24 @@ export const App: React.FC = () => {
 
   const processAudioInChunks = async (file: Blob) => {
     try {
+      // Se o áudio for pequeno (menos de 3MB base64), envia direto
+      if (file.size < 3 * 1024 * 1024) {
+        setProgress({ current: 1, total: 1 });
+        const mimeType = file.type || 'audio/mp3';
+        const base64 = await blobToBase64(file);
+        const chunkText = await transcribeAudio(base64, mimeType);
+        setTranscription(chunkText.trim());
+        setStatus(AppStatus.COMPLETED);
+        return;
+      }
+
+      // Para áudios mais longos (como 15 min), fatia em blocos leves de 5 minutos
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const arrayBuffer = await file.arrayBuffer();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
       
       const duration = audioBuffer.duration;
-      const chunkSizeInSeconds = CHUNK_SIZE_MINUTES * 60;
+      const chunkSizeInSeconds = 5 * 60; // 5 minutos por fatia
       const totalChunks = Math.ceil(duration / chunkSizeInSeconds);
       
       setProgress({ current: 0, total: totalChunks });
@@ -198,7 +210,7 @@ export const App: React.FC = () => {
         fullTranscript += (chunkText + " ");
 
         if (i < totalChunks - 1) {
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise(r => setTimeout(r, 500));
         }
       }
 
@@ -206,8 +218,17 @@ export const App: React.FC = () => {
       setStatus(AppStatus.COMPLETED);
     } catch (error: any) {
       console.error("Erro no processamento:", error);
-      setErrorMessage("Erro ao processar o áudio. Tente novamente ou verifique se o arquivo está corrompido.");
-      setStatus(AppStatus.ERROR);
+      // Fallback para envio direto se a decodificação do áudio falhar
+      try {
+        const mimeType = file.type || 'audio/mp3';
+        const base64 = await blobToBase64(file);
+        const chunkText = await transcribeAudio(base64, mimeType);
+        setTranscription(chunkText.trim());
+        setStatus(AppStatus.COMPLETED);
+      } catch (err: any) {
+        setErrorMessage(err.message || "Erro ao processar o áudio. Verifique sua conexão ou tente um arquivo menor.");
+        setStatus(AppStatus.ERROR);
+      }
     }
   };
 
