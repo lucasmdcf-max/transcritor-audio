@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/transcribe",
+      "destination": "/api/transcribe.ts"
+    },
+    {
+      "source": "/api/summarize",
+      "destination": "/api/summarize.ts"
+    },
+    {
+      "source": "/api/translate",
+      "destination": "/api/translate.ts"
+    },
+    {
+      "source": "/api/action-items",
+      "destination": "/api/action-items.ts"
+    }
+  ]
+}
