@@ -19,3 +19,4 @@ View your app in AI Studio: https://ai.studio/apps/0842b646-ace3-40a7-965b-26a7d
 3. Run the app:
    `npm run dev`
 "# transcritor-audio"  
+"# transcritor-audio"  
